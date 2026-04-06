@@ -4,8 +4,6 @@ const baseCanvas = document.getElementById("baseCanvas");
 const effectCanvas = document.getElementById("effectCanvas");
 const sampleCanvas = document.getElementById("sampleCanvas");
 const inputVideo = document.getElementById("inputVideo");
-const cameraButton = document.getElementById("cameraButton");
-const debugButton = document.getElementById("debugButton");
 const statusText = document.getElementById("statusText");
 
 const baseContext = baseCanvas.getContext("2d");
@@ -25,12 +23,31 @@ let handsInstance = null;
 let cameraInstance = null;
 let detectionReady = false;
 let handSeenAt = 0;
+let cameraStarted = false;
 
 function getRevealRadius(width) {
   return Math.max(70, Math.min(130, width * 0.18));
 }
 
 function resizeCanvas() {
+  if (posterImage.naturalWidth && posterImage.naturalHeight) {
+    const viewportPadding = window.innerWidth <= 480 ? 16 : window.innerWidth <= 720 ? 20 : 32;
+    const maxWidth = Math.min(720, window.innerWidth - viewportPadding);
+    const maxHeight = window.innerHeight - viewportPadding;
+    const ratio = posterImage.naturalWidth / posterImage.naturalHeight;
+
+    let frameWidth = maxWidth;
+    let frameHeight = frameWidth / ratio;
+
+    if (frameHeight > maxHeight) {
+      frameHeight = maxHeight;
+      frameWidth = frameHeight * ratio;
+    }
+
+    posterFrame.style.setProperty("--poster-width", `${Math.max(0, frameWidth)}px`);
+    posterFrame.style.setProperty("--poster-height", `${Math.max(0, frameHeight)}px`);
+  }
+
   const bounds = posterFrame.getBoundingClientRect();
   const scale = window.devicePixelRatio || 1;
 
@@ -296,11 +313,11 @@ function animate(timestamp) {
 }
 
 async function startCamera() {
-  if (!handsInstance || !cameraButton) {
+  if (!handsInstance || cameraStarted) {
     return;
   }
 
-  cameraButton.disabled = true;
+  cameraStarted = true;
   statusText.textContent = "카메라를 연결하고 손을 인식하는 중입니다.";
 
   try {
@@ -338,7 +355,7 @@ async function startCamera() {
     }, 3500);
   } catch (error) {
     statusText.textContent = "카메라 권한이 없거나 지원되지 않습니다. localhost 정적 서버에서 열어 주세요.";
-    cameraButton.disabled = false;
+    cameraStarted = false;
     console.error(error);
   }
 }
@@ -376,11 +393,8 @@ function init() {
 }
 
 window.addEventListener("resize", resizeCanvas);
-cameraButton.addEventListener("click", startCamera);
-debugButton.addEventListener("click", () => {
-  pointerPoint.active = true;
-  statusText.textContent = "마우스나 손가락을 포스터 위에서 움직이면 픽셀이 반짝입니다.";
-});
+posterFrame.addEventListener("click", startCamera, { once: true });
+posterFrame.addEventListener("touchstart", startCamera, { once: true, passive: true });
 effectCanvas.addEventListener("pointermove", setPointerFromEvent);
 effectCanvas.addEventListener("pointerenter", setPointerFromEvent);
 effectCanvas.addEventListener("pointerleave", () => {

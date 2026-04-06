@@ -11,37 +11,21 @@
 </head>
 <body>
   <main class="app-shell">
-    <section class="stage-panel">
-      <div class="stage-copy">
-        <p class="eyebrow">Interactive Poster Prototype</p>
-        <h1>손이 닿으면 픽셀들이 반짝이는 포스터</h1>
-        <p class="description">
-          포스터 이미지는 그대로 두고, 손 위치에 반응하는 반짝임 레이어만 올렸습니다.
-          카메라 권한을 허용하면 손끝 근처 픽셀들이 살아나듯 점등됩니다.
-        </p>
-      </div>
-
-      <div class="controls">
-        <button id="cameraButton" class="camera-button" type="button">카메라 켜기</button>
-        <button id="debugButton" class="ghost-button" type="button">마우스로 테스트</button>
-        <p id="statusText" class="status-text">카메라를 켜면 손 추적이 시작됩니다.</p>
-      </div>
-
-      <div id="posterFrame" class="poster-frame">
-        <canvas id="baseCanvas" class="base-canvas"></canvas>
-        <img
-          id="posterImage"
-          class="poster-image"
-          src="./assets/poster.png"
-          alt="국립공주대학교 졸업전시 포스터"
-        >
-        <canvas id="effectCanvas" class="effect-canvas"></canvas>
-      </div>
-    </section>
+    <div id="posterFrame" class="poster-frame">
+      <canvas id="baseCanvas" class="base-canvas"></canvas>
+      <img
+        id="posterImage"
+        class="poster-image"
+        src="./assets/poster.png"
+        alt="국립공주대학교 졸업전시 포스터"
+      >
+      <canvas id="effectCanvas" class="effect-canvas"></canvas>
+    </div>
   </main>
 
   <video id="inputVideo" class="input-video" playsinline muted></video>
   <canvas id="sampleCanvas" class="sample-canvas"></canvas>
+  <p id="statusText" class="sr-only" aria-live="polite">포스터를 터치하면 카메라가 켜집니다.</p>
 
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" defer></script>
