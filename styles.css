@@ -111,12 +111,14 @@ body {
 
 .status-text {
   margin: 0;
+  flex: 1 1 260px;
   color: var(--muted);
 }
 
 .poster-frame {
   position: relative;
   width: min(100%, 720px);
+  aspect-ratio: 1080 / 1528;
   border-radius: 28px;
   overflow: hidden;
   border: 1px solid var(--panel-border);
@@ -169,6 +171,7 @@ body {
 .effect-canvas {
   z-index: 2;
   cursor: crosshair;
+  touch-action: none;
 }
 
 .input-video,
@@ -182,14 +185,68 @@ body {
 
 @media (max-width: 720px) {
   .app-shell {
-    padding: 20px 14px 28px;
+    padding: 16px 10px 24px;
   }
 
   .stage-panel {
-    gap: 16px;
+    gap: 12px;
+  }
+
+  .stage-copy {
+    gap: 8px;
+  }
+
+  .eyebrow {
+    font-size: 0.72rem;
   }
 
   .stage-copy h1 {
-    max-width: 10ch;
+    font-size: clamp(1.6rem, 7vw, 2.5rem);
+    line-height: 0.98;
+    max-width: none;
+  }
+
+  .description {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .controls {
+    gap: 10px;
+  }
+
+  .camera-button,
+  .ghost-button {
+    flex: 1 1 160px;
+    min-height: 52px;
+    padding: 12px 18px;
+  }
+
+  .status-text {
+    flex-basis: 100%;
+    font-size: 0.92rem;
+  }
+
+  .poster-frame {
+    width: 100%;
+    border-radius: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-shell {
+    padding: 12px 8px 20px;
+  }
+
+  .stage-copy h1 {
+    font-size: clamp(1.35rem, 8vw, 2rem);
+  }
+
+  .description {
+    font-size: 0.88rem;
+  }
+
+  .poster-frame {
+    border-radius: 14px;
   }
 }

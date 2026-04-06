@@ -26,6 +26,10 @@ let cameraInstance = null;
 let detectionReady = false;
 let handSeenAt = 0;
 
+function getRevealRadius(width) {
+  return Math.max(70, Math.min(130, width * 0.18));
+}
+
 function resizeCanvas() {
   const bounds = posterFrame.getBoundingClientRect();
   const scale = window.devicePixelRatio || 1;
@@ -207,8 +211,9 @@ function getInteractionPoints() {
 
 function setPointerFromEvent(event) {
   const bounds = posterFrame.getBoundingClientRect();
-  pointerPoint.x = (event.clientX - bounds.left) / bounds.width;
-  pointerPoint.y = (event.clientY - bounds.top) / bounds.height;
+  const point = "touches" in event && event.touches.length > 0 ? event.touches[0] : event;
+  pointerPoint.x = (point.clientX - bounds.left) / bounds.width;
+  pointerPoint.y = (point.clientY - bounds.top) / bounds.height;
   pointerPoint.active =
     pointerPoint.x >= 0 &&
     pointerPoint.x <= 1 &&
@@ -230,6 +235,7 @@ function animate(timestamp) {
   const bounds = posterFrame.getBoundingClientRect();
   const width = bounds.width;
   const height = bounds.height;
+  const revealRadius = getRevealRadius(width);
   const delta = Math.min(0.05, (timestamp - lastTimestamp) / 1000 || 0.016);
   lastTimestamp = timestamp;
   const interactionPoints = getInteractionPoints();
@@ -244,8 +250,8 @@ function animate(timestamp) {
     for (const point of interactionPoints) {
       const px = point.x * width;
       const py = point.y * height;
-      effectContext.moveTo(px + 130, py);
-      effectContext.arc(px, py, 130, 0, Math.PI * 2);
+      effectContext.moveTo(px + revealRadius, py);
+      effectContext.arc(px, py, revealRadius, 0, Math.PI * 2);
       emitFlare(px, py, { r: 120, g: 220, b: 255 });
     }
 
@@ -373,11 +379,16 @@ window.addEventListener("resize", resizeCanvas);
 cameraButton.addEventListener("click", startCamera);
 debugButton.addEventListener("click", () => {
   pointerPoint.active = true;
-  statusText.textContent = "마우스를 포스터 위에서 움직이면 픽셀이 반짝입니다.";
+  statusText.textContent = "마우스나 손가락을 포스터 위에서 움직이면 픽셀이 반짝입니다.";
 });
 effectCanvas.addEventListener("pointermove", setPointerFromEvent);
 effectCanvas.addEventListener("pointerenter", setPointerFromEvent);
 effectCanvas.addEventListener("pointerleave", () => {
+  pointerPoint.active = false;
+});
+effectCanvas.addEventListener("touchstart", setPointerFromEvent, { passive: true });
+effectCanvas.addEventListener("touchmove", setPointerFromEvent, { passive: true });
+effectCanvas.addEventListener("touchend", () => {
   pointerPoint.active = false;
 });
 
